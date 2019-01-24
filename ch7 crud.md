@@ -139,3 +139,18 @@ return Acronym.query(on: r).group(.or, closure: { (or) in
     or.filter(\Acronym.long, .equal, searchTerm)
 }).all()
 ```
+
+### First Result
+
+If application requires only the first result of a query
+
+```Swift
+router.get("api", "acronyms", "first") { r -> Future<Acronym> in
+  return Acronym.query(on: r).first().map(to: Acronym.self) { acronym in
+    guard let acronym = acronym else {
+      throw Abort(.notFound)
+    }
+    return acronym
+  }
+}
+```
