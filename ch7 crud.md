@@ -154,3 +154,20 @@ router.get("api", "acronyms", "first") { r -> Future<Acronym> in
   }
 }
 ```
+
+### Sorting Results
+
+```Swift
+router.get("api", "acronyms", "sorted") { r -> Future<[Acronym]> in
+  return Acronym.query(on: r)
+  // 1
+    .sort(\.short, .ascending)
+    .all()
+}
+```
+
+Signature of sort takes in the Keypath of Acronym and the GenericSQLDirection.
+
+```Swift
+.sort(key: \Acronym.short, .ascending)
+```
