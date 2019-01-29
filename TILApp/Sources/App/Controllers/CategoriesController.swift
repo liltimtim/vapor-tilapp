@@ -14,6 +14,7 @@ struct CategoriesController: RouteCollection {
         grouping.put(use: updateHandler)
         grouping.get(use: getHandler)
         grouping.get(Category.parameter, use: getOneHandler)
+        grouping.get(Category.parameter, "acronyms", use: getAcronymsHandler)
     }
     
     func getHandler(_ r: Request) throws -> Future<[Category]> {
@@ -39,5 +40,11 @@ struct CategoriesController: RouteCollection {
     
     func removeHandler(_ r: Request) throws -> Future<HTTPStatus> {
         return try r.parameters.next(Category.self).delete(on: r).transform(to: HTTPStatus.noContent)
+    }
+    
+    func getAcronymsHandler(_ r: Request) throws -> Future<[Acronym]> {
+        return try r.parameters.next(Category.self).flatMap(to: [Acronym].self) { c in
+            try c.acronyms.query(on: r).all()
+        }
     }
 }

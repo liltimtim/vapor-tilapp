@@ -7,4 +7,8 @@ public func routes(_ router: Router) throws {
 
     let userController = UsersController()
     try router.register(collection: userController)
+    
+    let categoryController = CategoriesController()
+    try router.register(collection: categoryController)
+    
 }

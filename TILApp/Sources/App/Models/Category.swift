@@ -21,3 +21,8 @@ extension Category: Content { }
 extension Category: PostgreSQLModel { }
 extension Category: Parameter { }
 extension Category: Migration { }
+extension Category {
+    var acronyms: Siblings<Category, Acronym, AcronymCategoryPivot> {
+        return siblings()
+    }
+}

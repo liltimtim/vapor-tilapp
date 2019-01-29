@@ -27,7 +27,14 @@ struct AcronymsController: RouteCollection {
         routeGroup.delete(Acronym.parameter, use: deleteHandler)
         // api/acronyms/<id>/user
         
+        // api/acronyms/<id>/categories/<cat_id>
+        routeGroup.post(Acronym.parameter, "categories", Category.parameter, use: addCategoriesHandler)
         
+        // api/acronyms/<id>/categories
+        routeGroup.get(Acronym.parameter, "categories", use: getCategoriesHandler)
+        
+        // api/acronyms/<id>/categories/<cat_id>
+        routeGroup.delete(Acronym.parameter, "categories", Category.parameter, use: removeCategoriesHandler)
         /*
         router.post("api", "acronyms") { r -> Future<Acronym> in
             // decode the body
@@ -138,6 +145,29 @@ struct AcronymsController: RouteCollection {
         return try r.parameters.next(Acronym.self)
             .flatMap(to: User.self) { acronym in
                 acronym.user.get(on: r)
+        }
+    }
+    
+    func addCategoriesHandler(_ r: Request) throws -> Future<HTTPStatus> {
+        return try flatMap(
+            to: HTTPStatus.self,
+            r.parameters.next(Acronym.self),
+            r.parameters.next(Category.self)) { a, c in
+                return a.categories.attach(c, on: r)
+                .transform(to: .created)
+        }
+    }
+    
+    func getCategoriesHandler(_ r: Request) throws -> Future<[Category]> {
+        return try r.parameters.next(Acronym.self)
+            .flatMap(to: [Category].self) { a in
+                try a.categories.query(on: r).all()
+        }
+    }
+    
+    func removeCategoriesHandler(_ r: Request) throws -> Future<HTTPStatus> {
+        return try flatMap(to: HTTPStatus.self, r.parameters.next(Acronym.self), r.parameters.next(Category.self)) { a, c in
+            return a.categories.detach(c, on: r).transform(to: .noContent)
         }
     }
 }
